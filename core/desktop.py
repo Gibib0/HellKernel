@@ -35,12 +35,12 @@ class DesktopWindow(QMainWindow):
 
         self.icons = []
         self.create_icon(os.path.join(BASE_DIR, "assets", "icons", "Internet.png"), 50, 50)
-        self.create_icon(os.path.join(BASE_DIR, "assets", "icons", "Calculator.png"), 150, 50)
-        self.create_icon(os.path.join(BASE_DIR, "assets", "icons", "Translator.png"), 250, 50)
-        self.create_icon(os.path.join(BASE_DIR, "assets", "icons", "Trashbag.png"), 350, 50)
-        self.create_icon(os.path.join(BASE_DIR, "assets", "icons", "Advicer.png"), 450, 50)
-        self.create_icon(os.path.join(BASE_DIR, "assets", "icons", "Text_document.png"), 550, 50)
-        self.create_icon(os.path.join(BASE_DIR, "assets", "icons", "Thing", "Thing1.png"), 400, 400)
+        self.create_icon(os.path.join(BASE_DIR, "assets", "icons", "Calculator.png"), 50, 250)
+        self.create_icon(os.path.join(BASE_DIR, "assets", "icons", "Translator.png"), 50, 450)
+        self.create_icon(os.path.join(BASE_DIR, "assets", "icons", "Trashbag.png"), 800, 700)
+        self.create_icon(os.path.join(BASE_DIR, "assets", "icons", "Advicer.png"), 800, 400)
+        self.create_icon(os.path.join(BASE_DIR, "assets", "icons", "Text_document.png"), 800, 450, 128)
+        self.create_icon(os.path.join(BASE_DIR, "assets", "icons", "Thing", "Thing1.png"), 400, 400, 512)
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
@@ -52,24 +52,32 @@ class DesktopWindow(QMainWindow):
         if hasattr(self, 'icons_widget'):
             self.icons_widget.setGeometry(0, 0, self.width(), self.height())
 
-    def create_icon(self, image_path, x, y):
+    def create_icon(self, image_path, x, y, size=128):
         if not os.path.exists(image_path):
             print(f"The icon image is not found: {image_path}")
             return
 
         button = QPushButton(self.icons_widget)
-        button.setIcon(QIcon(image_path))
+
         pixmap = QPixmap(image_path)
-        button.setIconSize(pixmap.size())
-        button.setGeometry(x, y, pixmap.width(), pixmap.height())
-        button.setStyleSheet("""
-            QPushButton {
+        scaled_pixmap = pixmap.scaled(size, size, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+
+        button.setIcon(QIcon(scaled_pixmap))
+        button.setIconSize(scaled_pixmap.size())
+        button.setGeometry(x, y, size, size)
+
+        button.setStyleSheet(f"""
+            QPushButton {{
                 border: none;
                 background: transparent;
-            }
-            QPushButton:hover {
+            }}
+            QPushButton:hover {{
                 background: rgba(255, 255, 255, 50);
-                border-radius: 5px;
-            }
+                border-radius: {size // 8}px;
+            }}
+            QPushButton:pressed {{
+                background: rgba(255, 255, 255, 100);
+            }}
         """)
         self.icons.append(button)
+        return button
